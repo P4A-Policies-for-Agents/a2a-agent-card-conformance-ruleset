@@ -67,6 +67,23 @@ through a governance profile that covers your A2A agent card assets.
   http://a.ml/vocabularies/core#icon_`), and the rules use paths like `snakeIcon.url`. Each alias
   has its own bad fixture.
 
+## Test on Exchange assets
+
+To try the ruleset on real assets, publish the fixtures to a test business group, then attach
+the ruleset to them, for example with a draft governance profile. Copy `.env.example` to `.env`
+and fill in a connected app and business group ID; `.env` is gitignored.
+
+```bash
+scripts/publish-examples.sh --dry-run   # list the assets
+scripts/publish-examples.sh             # <prefix>-ok plus one <prefix>-<rule-id> per rule
+scripts/publish-examples.sh --all       # also every bad variant and the scope fixtures
+scripts/cleanup-examples.sh             # soft-delete them all after testing (--hard, --yes)
+```
+
+`<prefix>-ok` should give 0 findings, and each `<prefix>-<rule-id>` exactly the finding named in
+its description. Publishing skips versions that already exist; to republish changed fixtures,
+clean up first or set `EXAMPLES_VERSION`.
+
 ## Development
 
 `scripts/check.sh` needs governance plugin **1.1.4 or later**. One way to install it without

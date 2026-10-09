@@ -197,10 +197,30 @@ BAD = {
     "provider-complete.no-organization": lambda d: d["provider"].pop("organization"),
     "provider-complete.no-url": lambda d: d["provider"].pop("url"),
     "provider-complete.empty-url": lambda d: put(d["provider"], "url", ""),
+    "interface-url-required": lambda d: iface(d).pop("url"),
+    # Review Focus 3: only the second interface is broken.
+    "interface-url-required.second-interface": lambda d: iface(d, 1).pop("url"),
+    "interface-url-required.empty": lambda d: put(iface(d), "url", ""),
+    "interface-protocol-binding-required": lambda d: iface(d).pop("protocolBinding"),
+    "interface-protocol-binding-required.empty": lambda d: put(iface(d), "protocolBinding", ""),
+    "interface-protocol-version-required": lambda d: iface(d).pop("protocolVersion"),
+    "interface-protocol-version-required.empty": lambda d: put(iface(d), "protocolVersion", ""),
+    "interface-protocol-version-format": lambda d: put(iface(d), "protocolVersion", "1.0.0"),
+    "interface-protocol-version-format.second-interface": lambda d: put(iface(d, 1), "protocolVersion", "v1"),
+    "interface-protocol-binding-known": lambda d: put(iface(d), "protocolBinding", "SOAP"),
 }
 
 # Fixtures that legitimately trip more than one rule: name -> every "<id>:<Severity>" expected.
-EXPECTED = {}
+EXPECTED = {
+    "interface-protocol-binding-required.empty": [
+        "interface-protocol-binding-required:Violation",
+        "interface-protocol-binding-known:Warning",
+    ],
+    "interface-protocol-version-required.empty": [
+        "interface-protocol-version-required:Violation",
+        "interface-protocol-version-format:Warning",
+    ],
+}
 
 
 def main():

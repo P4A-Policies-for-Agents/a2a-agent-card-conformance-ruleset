@@ -1,0 +1,2 @@
+interface-protocol-binding-known:Warning
+interface-protocol-binding-required:Violation

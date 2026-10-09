@@ -17,7 +17,13 @@ violation:
   - card-skills-required
   - card-supported-interfaces-required
   - card-version-required
+  - interface-protocol-binding-required
+  - interface-protocol-version-required
+  - interface-url-required
   - provider-complete
+warning:
+  - interface-protocol-binding-known
+  - interface-protocol-version-format
 validations:
   card-name-required:
     message: Agent Card has no `name`, or it is empty. Set `name` to a human-readable agent name (A2A v1.0 marks AgentCard.name REQUIRED).
@@ -214,3 +220,78 @@ validations:
         api.contract / doc.encodes / core.provider / core.url:
           minCount: 1
           minLength: 1
+  interface-url-required:
+    message: This supportedInterfaces entry has no `url`, or it is empty. Set the absolute URL where the interface is served.
+    documentation: |
+      AgentInterface.url is where clients send requests for this binding. A2A v1.0 marks it
+      REQUIRED, and an interface without one is unreachable.
+    examples:
+      valid: |
+        {"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0"}
+      invalid: |
+        {"protocolBinding": "JSONRPC", "protocolVersion": "1.0"}
+    targetClass: core.supportedInterfaces
+    propertyConstraints:
+      core.url:
+        minCount: 1
+        minLength: 1
+  interface-protocol-binding-required:
+    message: This supportedInterfaces entry has no `protocolBinding`, or it is empty. Set JSONRPC, GRPC, HTTP+JSON or your custom binding.
+    documentation: |
+      AgentInterface.protocolBinding tells clients which wire format to speak at `url`. A2A
+      v1.0 marks it REQUIRED.
+    examples:
+      valid: |
+        {"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0"}
+      invalid: |
+        {"url": "https://agent.example.com/a2a", "protocolVersion": "1.0"}
+    targetClass: core.supportedInterfaces
+    propertyConstraints:
+      core.protocolBinding:
+        minCount: 1
+        minLength: 1
+  interface-protocol-version-required:
+    message: This supportedInterfaces entry has no `protocolVersion`, or it is empty. Set the A2A version the interface speaks, for example 1.0 (an empty value means 0.3).
+    documentation: |
+      AgentInterface.protocolVersion tells clients which A2A version the interface implements.
+      A2A v1.0 marks it REQUIRED, and clients treat an empty value as 0.3. A v1.0 card that
+      leaves it empty is therefore read as a 0.3 interface.
+    examples:
+      valid: |
+        {"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0"}
+      invalid: |
+        {"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocolVersion": ""}
+    targetClass: core.supportedInterfaces
+    propertyConstraints:
+      core.protocolVersion:
+        minCount: 1
+        minLength: 1
+  interface-protocol-version-format:
+    message: This supportedInterfaces entry's `protocolVersion` is not Major.Minor. Use a value like 1.0, without a patch number.
+    documentation: |
+      A2A v1.0 versions the protocol as Major.Minor and says patch versions SHOULD NOT appear in
+      protocolVersion. Clients negotiating versions may not match "1.0.0" or "v1" against "1.0".
+    examples:
+      valid: |
+        {"protocolVersion": "1.0"}
+      invalid: |
+        {"protocolVersion": "1.0.0"}
+    targetClass: core.supportedInterfaces
+    propertyConstraints:
+      core.protocolVersion:
+        pattern: "^[0-9]+\\.[0-9]+$"
+  interface-protocol-binding-known:
+    message: This supportedInterfaces entry uses a `protocolBinding` other than JSONRPC, GRPC or HTTP+JSON. Use a core binding unless every client is known to support the custom one.
+    documentation: |
+      A2A v1.0 defines three core bindings (JSONRPC, GRPC, HTTP+JSON) and allows custom ones.
+      Generic A2A clients only speak the core bindings, so a custom-only card is unreachable to
+      them. This is a warning because custom bindings are legal.
+    examples:
+      valid: |
+        {"protocolBinding": "HTTP+JSON"}
+      invalid: |
+        {"protocolBinding": "SOAP"}
+    targetClass: core.supportedInterfaces
+    propertyConstraints:
+      core.protocolBinding:
+        in: [JSONRPC, GRPC, "HTTP+JSON"]

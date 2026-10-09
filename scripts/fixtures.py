@@ -181,6 +181,19 @@ def write(name, doc, main_file="agent-card.json", classifier="a2a-v1-card", expe
 BAD = {
     "card-name-required": lambda d: d.pop("name"),
     "card-name-required.empty": lambda d: put(d, "name", ""),
+    "card-description-required": lambda d: d.pop("description"),
+    "card-description-required.empty": lambda d: put(d, "description", ""),
+    "card-version-required": lambda d: d.pop("version"),
+    "card-version-required.empty": lambda d: put(d, "version", ""),
+    "card-capabilities-required": lambda d: d.pop("capabilities"),
+    "card-supported-interfaces-required": lambda d: d.pop("supportedInterfaces"),
+    "card-supported-interfaces-required.empty-array": lambda d: put(d, "supportedInterfaces", []),
+    "card-default-input-modes-required": lambda d: d.pop("defaultInputModes"),
+    "card-default-input-modes-required.empty-array": lambda d: put(d, "defaultInputModes", []),
+    "card-default-output-modes-required": lambda d: d.pop("defaultOutputModes"),
+    "card-default-output-modes-required.empty-array": lambda d: put(d, "defaultOutputModes", []),
+    "card-skills-required": lambda d: d.pop("skills"),
+    "card-skills-required.empty-array": lambda d: put(d, "skills", []),
 }
 
 # Fixtures that legitimately trip more than one rule: name -> every "<id>:<Severity>" expected.

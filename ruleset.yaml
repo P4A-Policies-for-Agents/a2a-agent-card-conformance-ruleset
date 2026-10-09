@@ -9,7 +9,14 @@ prefixes:
   api: http://anypoint.com/vocabs/api#
   catalog: http://anypoint.com/vocabs/digital-repository#
 violation:
+  - card-capabilities-required
+  - card-default-input-modes-required
+  - card-default-output-modes-required
+  - card-description-required
   - card-name-required
+  - card-skills-required
+  - card-supported-interfaces-required
+  - card-version-required
 validations:
   card-name-required:
     message: Agent Card has no `name`, or it is empty. Set `name` to a human-readable agent name (A2A v1.0 marks AgentCard.name REQUIRED).
@@ -33,3 +40,148 @@ validations:
         api.contract / doc.encodes / core.name:
           minCount: 1
           minLength: 1
+  card-description-required:
+    message: Agent Card has no `description`, or it is empty. Describe what the agent does in one or two sentences (A2A v1.0 marks AgentCard.description REQUIRED).
+    documentation: |
+      Clients, registries and routing agents read `description` to decide whether this agent
+      can handle a task. A2A v1.0 marks AgentCard.description REQUIRED. This finding is
+      reported on the asset, not on a line of the card.
+    examples:
+      valid: |
+        {"name": "Weather Agent", "description": "Answers weather questions for a city."}
+      invalid: |
+        {"name": "Weather Agent", "description": ""}
+    targetClass: api.Project
+    if:
+      propertyConstraints:
+        catalog.classifier:
+          in: [a2a-v1-card]
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / core.description:
+          minCount: 1
+          minLength: 1
+  card-version-required:
+    message: Agent Card has no `version`, or it is empty. Set `version` to the agent's own version, for example 1.0.0 (A2A v1.0 marks AgentCard.version REQUIRED).
+    documentation: |
+      `version` is the agent's version, not the protocol's. Clients and caches use it to tell
+      card revisions apart. A2A v1.0 marks AgentCard.version REQUIRED. This finding is
+      reported on the asset, not on a line of the card.
+    examples:
+      valid: |
+        {"name": "Weather Agent", "version": "1.0.0"}
+      invalid: |
+        {"name": "Weather Agent"}
+    targetClass: api.Project
+    if:
+      propertyConstraints:
+        catalog.classifier:
+          in: [a2a-v1-card]
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / core.version:
+          minCount: 1
+          minLength: 1
+  card-capabilities-required:
+    message: Agent Card has no `capabilities` object. Add `capabilities` and declare streaming, pushNotifications and extendedAgentCard as they apply (A2A v1.0 marks AgentCard.capabilities REQUIRED).
+    documentation: |
+      Clients read `capabilities` to know whether they may stream, register push
+      notifications, or fetch an extended card. Without it they must guess. A2A v1.0 marks
+      AgentCard.capabilities REQUIRED. This finding is reported on the asset, not on a line of
+      the card.
+    examples:
+      valid: |
+        {"capabilities": {"streaming": true, "pushNotifications": false}}
+      invalid: |
+        {"name": "Weather Agent"}
+    targetClass: api.Project
+    if:
+      propertyConstraints:
+        catalog.classifier:
+          in: [a2a-v1-card]
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / core.capabilities:
+          minCount: 1
+  card-supported-interfaces-required:
+    message: Agent Card has no `supportedInterfaces`, or the list is empty. Declare at least one AgentInterface with url, protocolBinding and protocolVersion (A2A v1.0 marks AgentCard.supportedInterfaces REQUIRED).
+    documentation: |
+      `supportedInterfaces` is the only place a v1.0 card says where and how to reach the
+      agent. A card without it can't be called. A2A v1.0 marks it REQUIRED, and required
+      arrays must hold at least one element. This finding is reported on the asset, not on a
+      line of the card.
+    examples:
+      valid: |
+        {"supportedInterfaces": [{"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0"}]}
+      invalid: |
+        {"supportedInterfaces": []}
+    targetClass: api.Project
+    if:
+      propertyConstraints:
+        catalog.classifier:
+          in: [a2a-v1-card]
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / core.supportedInterfaces:
+          minCount: 1
+  card-default-input-modes-required:
+    message: Agent Card has no `defaultInputModes`, or the list is empty. List the media types the agent accepts, for example text/plain (A2A v1.0 marks AgentCard.defaultInputModes REQUIRED).
+    documentation: |
+      Clients use `defaultInputModes` to decide which message parts they may send. A2A v1.0
+      marks it REQUIRED, and required arrays must hold at least one element. This finding is
+      reported on the asset, not on a line of the card.
+    examples:
+      valid: |
+        {"defaultInputModes": ["text/plain"]}
+      invalid: |
+        {"defaultInputModes": []}
+    targetClass: api.Project
+    if:
+      propertyConstraints:
+        catalog.classifier:
+          in: [a2a-v1-card]
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / core.defaultInputModes:
+          minCount: 1
+  card-default-output-modes-required:
+    message: Agent Card has no `defaultOutputModes`, or the list is empty. List the media types the agent returns, for example text/plain (A2A v1.0 marks AgentCard.defaultOutputModes REQUIRED).
+    documentation: |
+      Clients use `defaultOutputModes` to know which response parts they must handle. A2A
+      v1.0 marks it REQUIRED, and required arrays must hold at least one element. This finding
+      is reported on the asset, not on a line of the card.
+    examples:
+      valid: |
+        {"defaultOutputModes": ["text/plain", "application/json"]}
+      invalid: |
+        {"name": "Weather Agent"}
+    targetClass: api.Project
+    if:
+      propertyConstraints:
+        catalog.classifier:
+          in: [a2a-v1-card]
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / core.defaultOutputModes:
+          minCount: 1
+  card-skills-required:
+    message: Agent Card has no `skills`, or the list is empty. Declare at least one AgentSkill (A2A v1.0 marks AgentCard.skills REQUIRED).
+    documentation: |
+      Skills are how routing agents and registries match tasks to agents. A card with no
+      skills can't be discovered for any task. A2A v1.0 marks AgentCard.skills REQUIRED, and
+      required arrays must hold at least one element. This finding is reported on the asset,
+      not on a line of the card.
+    examples:
+      valid: |
+        {"skills": [{"id": "current-weather", "name": "Current weather", "description": "Reports the weather.", "tags": ["weather"]}]}
+      invalid: |
+        {"skills": []}
+    targetClass: api.Project
+    if:
+      propertyConstraints:
+        catalog.classifier:
+          in: [a2a-v1-card]
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / core.skills:
+          minCount: 1

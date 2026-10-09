@@ -1,0 +1,111 @@
+{
+  "name": "Weather Agent",
+  "description": "Answers questions about current weather and forecasts for a city.",
+  "supportedInterfaces": [
+    {
+      "url": "https://weather.example.com/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "https://weather.example.com/a2a/grpc",
+      "protocolBinding": "GRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "provider": {
+    "organization": "Example Corp",
+    "url": "https://example.com"
+  },
+  "version": "1.0.0",
+  "documentationUrl": "https://example.com/docs/weather-agent",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "extendedAgentCard": true
+  },
+  "securitySchemes": {
+    "bearer": {
+      "httpAuthSecurityScheme": {
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "oauth": {
+      "oauth2SecurityScheme": {
+        "oauth2MetadataUrl": "https://auth.example.com/.well-known/oauth-authorization-server",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.example.com/authorize",
+            "tokenUrl": "https://auth.example.com/token",
+            "scopes": {
+              "weather:read": "Read weather data"
+            },
+            "pkceRequired": true
+          }
+        }
+      }
+    },
+    "oidc": {
+      "openIdConnectSecurityScheme": {
+        "openIdConnectUrl": "https://id.example.com/.well-known/openid-configuration"
+      }
+    },
+    "key": {
+      "apiKeySecurityScheme": {
+        "location": "header",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "securityRequirements": [
+    {
+      "schemes": {
+        "bearer": {
+          "list": []
+        }
+      }
+    },
+    {
+      "schemes": {
+        "oauth": {
+          "list": [
+            "weather:read"
+          ]
+        }
+      }
+    }
+  ],
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [],
+  "skills": [
+    {
+      "id": "current-weather",
+      "name": "Current weather",
+      "description": "Reports the current weather for a city.",
+      "tags": [
+        "weather"
+      ],
+      "examples": [
+        "What's the weather in Paris?"
+      ]
+    },
+    {
+      "id": "forecast",
+      "name": "Forecast",
+      "description": "Gives a five-day forecast for a city.",
+      "tags": [
+        "weather",
+        "forecast"
+      ]
+    }
+  ],
+  "signatures": [
+    {
+      "protected": "eyJhbGciOiJFUzI1NiJ9",
+      "signature": "c2lnbmF0dXJl"
+    }
+  ]
+}

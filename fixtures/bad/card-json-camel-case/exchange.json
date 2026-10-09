@@ -1,0 +1,9 @@
+{
+  "main": "agent-card.json",
+  "name": "bad-card-json-camel-case",
+  "groupId": "p4a-fixtures",
+  "assetId": "bad-card-json-camel-case",
+  "version": "1.0.0",
+  "classifier": "a2a-v1-card",
+  "descriptorVersion": "1.0.0"
+}

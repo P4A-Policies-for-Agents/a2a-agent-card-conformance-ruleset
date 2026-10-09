@@ -221,6 +221,19 @@ BAD = {
     "signature-complete.no-protected": lambda d: d["signatures"][0].pop("protected"),
     "signature-complete.no-signature": lambda d: d["signatures"][0].pop("signature"),
     "signature-complete.empty-signature": lambda d: put(d["signatures"][0], "signature", ""),
+    "card-json-camel-case": lambda d: put(d, "icon_url", "https://example.com/icon.png"),
+    "card-json-camel-case.supported-interfaces": lambda d: rename(d, "supportedInterfaces", "supported_interfaces"),
+    "interface-json-camel-case": lambda d: rename(iface(d), "protocolVersion", "protocol_version"),
+    "skill-json-camel-case": lambda d: put(skill(d), "input_modes", ["text/plain"]),
+    # One fixture per alias, so a typo in a snake* prefix namespace (ruleset.yaml) can't hide.
+    "card-json-camel-case.default-input-modes": lambda d: put(d, "default_input_modes", ["text/plain"]),
+    "card-json-camel-case.default-output-modes": lambda d: put(d, "default_output_modes", ["text/plain"]),
+    "card-json-camel-case.documentation-url": lambda d: put(d, "documentation_url", "https://example.com/docs"),
+    "card-json-camel-case.security-schemes": lambda d: put(d, "security_schemes", copy.deepcopy(d["securitySchemes"])),
+    "card-json-camel-case.security-requirements": lambda d: put(d, "security_requirements", copy.deepcopy(d["securityRequirements"])),
+    "interface-json-camel-case.protocol-binding": lambda d: put(iface(d), "protocol_binding", "JSONRPC"),
+    "skill-json-camel-case.output-modes": lambda d: put(skill(d), "output_modes", ["text/plain"]),
+    "skill-json-camel-case.security-requirements": lambda d: put(skill(d), "security_requirements", copy.deepcopy(d["securityRequirements"])),
 }
 
 # Fixtures that legitimately trip more than one rule: name -> every "<id>:<Severity>" expected.
@@ -232,6 +245,14 @@ EXPECTED = {
     "interface-protocol-version-required.empty": [
         "interface-protocol-version-required:Violation",
         "interface-protocol-version-format:Warning",
+    ],
+    "card-json-camel-case.supported-interfaces": [
+        "card-json-camel-case:Violation",
+        "card-supported-interfaces-required:Violation",
+    ],
+    "interface-json-camel-case": [
+        "interface-json-camel-case:Violation",
+        "interface-protocol-version-required:Violation",
     ],
 }
 

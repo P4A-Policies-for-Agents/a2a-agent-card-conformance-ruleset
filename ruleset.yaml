@@ -8,15 +8,28 @@ description: >-
 prefixes:
   api: http://anypoint.com/vocabs/api#
   catalog: http://anypoint.com/vocabs/digital-repository#
+  # snake_case aliases (camelCase rules). Compact IRIs can't contain `_`, so each prefix's
+  # namespace ends with the alias's leading words: snakeIcon.url is core#icon_url.
+  snakeDefaultInput: http://a.ml/vocabularies/core#default_input_
+  snakeDefaultOutput: http://a.ml/vocabularies/core#default_output_
+  snakeDocumentation: http://a.ml/vocabularies/core#documentation_
+  snakeIcon: http://a.ml/vocabularies/core#icon_
+  snakeInput: http://a.ml/vocabularies/core#input_
+  snakeOutput: http://a.ml/vocabularies/core#output_
+  snakeProtocol: http://a.ml/vocabularies/core#protocol_
+  snakeSecurity: http://a.ml/vocabularies/core#security_
+  snakeSupported: http://a.ml/vocabularies/core#supported_
 violation:
   - card-capabilities-required
   - card-default-input-modes-required
   - card-default-output-modes-required
   - card-description-required
+  - card-json-camel-case
   - card-name-required
   - card-skills-required
   - card-supported-interfaces-required
   - card-version-required
+  - interface-json-camel-case
   - interface-protocol-binding-required
   - interface-protocol-version-required
   - interface-url-required
@@ -24,6 +37,7 @@ violation:
   - signature-complete
   - skill-description-required
   - skill-id-required
+  - skill-json-camel-case
   - skill-name-required
   - skill-tags-required
 warning:
@@ -381,3 +395,72 @@ validations:
       core.signature:
         minCount: 1
         minLength: 1
+  card-json-camel-case:
+    message: Agent Card uses a snake_case field name (supported_interfaces, default_input_modes, default_output_modes, documentation_url, icon_url, security_schemes or security_requirements). Rename it to camelCase; A2A v1.0 JSON MUST use camelCase.
+    documentation: |
+      A2A v1.0 says the JSON form of the card MUST use camelCase field names. Anypoint's card
+      schema also accepts proto-style snake_case aliases and does not normalize them. A
+      snake_case card therefore looks complete to its author while clients and every other
+      rule see the field as missing. This finding is reported on the asset, not on a line of
+      the card.
+    examples:
+      valid: |
+        {"supportedInterfaces": [{"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0"}]}
+      invalid: |
+        {"supported_interfaces": [{"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0"}]}
+    targetClass: api.Project
+    if:
+      propertyConstraints:
+        catalog.classifier:
+          in: [a2a-v1-card]
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / snakeSupported.interfaces:
+          maxCount: 0
+        api.contract / doc.encodes / snakeDefaultInput.modes:
+          maxCount: 0
+        api.contract / doc.encodes / snakeDefaultOutput.modes:
+          maxCount: 0
+        api.contract / doc.encodes / snakeDocumentation.url:
+          maxCount: 0
+        api.contract / doc.encodes / snakeIcon.url:
+          maxCount: 0
+        api.contract / doc.encodes / snakeSecurity.schemes:
+          maxCount: 0
+        api.contract / doc.encodes / snakeSecurity.requirements:
+          maxCount: 0
+  interface-json-camel-case:
+    message: This supportedInterfaces entry uses protocol_binding or protocol_version. Rename it to protocolBinding or protocolVersion; A2A v1.0 JSON MUST use camelCase.
+    documentation: |
+      A2A v1.0 JSON MUST use camelCase. The snake_case aliases are accepted by Anypoint's
+      schema but stored under a different name, so clients don't see the binding or version.
+    examples:
+      valid: |
+        {"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0"}
+      invalid: |
+        {"url": "https://agent.example.com/a2a", "protocolBinding": "JSONRPC", "protocol_version": "1.0"}
+    targetClass: core.supportedInterfaces
+    propertyConstraints:
+      snakeProtocol.binding:
+        maxCount: 0
+      snakeProtocol.version:
+        maxCount: 0
+  skill-json-camel-case:
+    message: This skill uses input_modes, output_modes or security_requirements. Rename it to inputModes, outputModes or securityRequirements; A2A v1.0 JSON MUST use camelCase.
+    documentation: |
+      A2A v1.0 JSON MUST use camelCase. The snake_case aliases are accepted by Anypoint's
+      schema but stored under a different name, so clients ignore the skill's modes and
+      security requirements.
+    examples:
+      valid: |
+        {"id": "forecast", "inputModes": ["text/plain"]}
+      invalid: |
+        {"id": "forecast", "input_modes": ["text/plain"]}
+    targetClass: core.skills
+    propertyConstraints:
+      snakeInput.modes:
+        maxCount: 0
+      snakeOutput.modes:
+        maxCount: 0
+      snakeSecurity.requirements:
+        maxCount: 0

@@ -1,0 +1,48 @@
+{
+  "protocolVersion": "2025-06-18",
+  "transport": {
+    "kind": "streamableHttp",
+    "path": "/mcp"
+  },
+  "provider": {
+    "organization": "Example Corp",
+    "url": "http://example.com"
+  },
+  "capabilities": {
+    "tools": {}
+  },
+  "securitySchemes": {
+    "legacy": {
+      "type": "oauth2",
+      "flows": {
+        "implicit": {
+          "authorizationUrl": "http://auth.example.com/authorize",
+          "scopes": {}
+        },
+        "password": {
+          "tokenUrl": "http://auth.example.com/token",
+          "scopes": {}
+        }
+      }
+    },
+    "key": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "api_key"
+    },
+    "oidc": {
+      "type": "openIdConnect",
+      "openIdConnectUrl": "http://id.example.com/.well-known/openid-configuration"
+    }
+  },
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Gets the current weather for a city.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "main": "mcp-metadata.json",
+  "name": "scope-mcp-manifest",
+  "groupId": "p4a-fixtures",
+  "assetId": "scope-mcp-manifest",
+  "version": "1.0.0",
+  "classifier": "mcp-metadata",
+  "descriptorVersion": "1.0.0"
+}

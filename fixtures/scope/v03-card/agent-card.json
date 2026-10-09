@@ -1,0 +1,53 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "Weather Agent",
+  "description": "Answers questions about current weather and forecasts for a city.",
+  "url": "http://weather.example.com/a2a",
+  "preferredTransport": "JSONRPC",
+  "provider": {
+    "organization": "Example Corp",
+    "url": "https://example.com"
+  },
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false
+  },
+  "securitySchemes": {
+    "legacy": {
+      "type": "oauth2",
+      "flows": {
+        "implicit": {
+          "authorizationUrl": "http://auth.example.com/authorize",
+          "scopes": {}
+        }
+      }
+    },
+    "key": {
+      "type": "apiKey",
+      "in": "query",
+      "name": "api_key"
+    }
+  },
+  "security": [
+    {
+      "legacy": []
+    }
+  ],
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "current-weather",
+      "name": "Current weather",
+      "description": "Reports the current weather.",
+      "tags": [
+        "weather"
+      ]
+    }
+  ]
+}

@@ -218,6 +218,9 @@ BAD = {
     "skill-description-required.empty": lambda d: put(skill(d), "description", ""),
     "skill-tags-required": lambda d: skill(d).pop("tags"),
     "skill-tags-required.empty-array": lambda d: put(skill(d), "tags", []),
+    "signature-complete.no-protected": lambda d: d["signatures"][0].pop("protected"),
+    "signature-complete.no-signature": lambda d: d["signatures"][0].pop("signature"),
+    "signature-complete.empty-signature": lambda d: put(d["signatures"][0], "signature", ""),
 }
 
 # Fixtures that legitimately trip more than one rule: name -> every "<id>:<Severity>" expected.

@@ -1,0 +1,9 @@
+{
+  "main": "agent-card.json",
+  "name": "bad-signature-complete-no-signature",
+  "groupId": "p4a-fixtures",
+  "assetId": "bad-signature-complete-no-signature",
+  "version": "1.0.0",
+  "classifier": "a2a-v1-card",
+  "descriptorVersion": "1.0.0"
+}

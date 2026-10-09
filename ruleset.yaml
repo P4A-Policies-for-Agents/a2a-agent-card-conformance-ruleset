@@ -21,6 +21,7 @@ violation:
   - interface-protocol-version-required
   - interface-url-required
   - provider-complete
+  - signature-complete
   - skill-description-required
   - skill-id-required
   - skill-name-required
@@ -360,3 +361,23 @@ validations:
     propertyConstraints:
       core.tags:
         minCount: 1
+  signature-complete:
+    message: This Agent Card signature is missing `protected` or `signature`, or one is empty. Each AgentCardSignature needs the base64url protected header and the base64url signature.
+    documentation: |
+      A2A v1.0 cards may carry JWS signatures. AgentCardSignature.protected and
+      AgentCardSignature.signature are REQUIRED. Without either, clients can't verify the card
+      and must treat it as unsigned. This rule checks shape only. Verifying the signature is a
+      runtime concern.
+    examples:
+      valid: |
+        {"signatures": [{"protected": "eyJhbGciOiJFUzI1NiJ9", "signature": "c2lnbmF0dXJl"}]}
+      invalid: |
+        {"signatures": [{"protected": "eyJhbGciOiJFUzI1NiJ9"}]}
+    targetClass: core.signatures
+    propertyConstraints:
+      core.protected:
+        minCount: 1
+        minLength: 1
+      core.signature:
+        minCount: 1
+        minLength: 1

@@ -1,6 +1,6 @@
 # A2A Agent Card Conformance & A2A Agent Safety rulesets (design)
 
-Date: 2026-10-09. Status: draft, awaiting review.
+Date: 2026-10-09. Status: approved 2026-10-09.
 
 ## Goal
 
@@ -93,6 +93,11 @@ Only `anypoint-project-builder` 2.7.0 parses it, which ships with governance plu
   query string passed every camelCase safety probe. The spec says JSON MUST use camelCase, so both
   rulesets add camelCase rules (below). Where an alias sits under a user-chosen map key, it can't be
   reached; see Limitations.
+- **snake_case paths need prefixes** (found during implementation). A compact IRI can't contain
+  `_`: `core.icon_url` makes the validator panic, and the run falls back to legacy mode. The rules
+  declare prefixes whose namespace ends with the alias's leading words (`snakeIcon:
+  http://a.ml/vocabularies/core#icon_`) and use paths such as `snakeIcon.url`. The rule tables
+  below still write the alias as `core.<alias>` for readability.
 
 ## Rule catalog
 
@@ -195,8 +200,6 @@ Each v1 fixture folder holds `agent-card.json` plus an `exchange.json` with
 `"classifier": "a2a-v1-card"`, `"descriptorVersion": "1.0.0"` and `"main": "agent-card.json"`.
 
 The design spec and implementation plan live in the conformance repo under `docs/superpowers/`.
-Until the repos exist, the spec lives in the container folder at
-`ms-omni-governance-rulesets/docs/superpowers/specs/`.
 
 ## Testing (`scripts/check.sh`)
 

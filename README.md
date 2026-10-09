@@ -41,17 +41,27 @@ them out.
 The `skill-*` and `signature-complete` rules also run on v0.3 cards, which have the same
 requirements. A compliant v0.3 card produces no findings.
 
-## Deploy it to your org
+## Run it locally or in CI
 
-Find this ruleset in the [P4A catalog](https://www.p4a.ai) and deploy it to your Anypoint org,
-either with **Publish to Exchange** or with the P4A MCP server's `deploy_ruleset`. Then apply it
-through a governance profile that covers your A2A agent card assets.
+> **Not deployable to hosted Anypoint API Governance today.** For `type=agent` assets, hosted
+> governance validates the `agent-metadata.json` that Exchange generates (`platform` and
+> `protocol` only), not the Agent Card. None of the card fields these rules read reach the
+> hosted validator, so a governance profile reports false findings or none at all. This was
+> tested on 2026-10-09 with probe rulesets against `a2a-v1-card` assets. This ruleset isn't
+> listed in the P4A catalog until that changes.
+
+Validate an agent card project (a folder with the card and an `exchange.json` whose `main` is the
+card and whose `classifier` is `a2a-v1-card`) with governance plugin 1.1.4 or later. See
+[Development](#development) for the install.
+
+```bash
+anypoint-cli-v4 governance:api:validate path/to/agent-project --rulesets ruleset.yaml
+```
 
 ## Limitations
 
-- **Hosted support is unverified.** Validating `a2a-v1-card` assets needs governance plugin
-  1.1.4 or later. It isn't yet confirmed that Anypoint's hosted governance validates these
-  assets.
+- **Hosted governance doesn't see the card.** See [Run it locally or in CI](#run-it-locally-or-in-ci).
+  Validating `a2a-v1-card` projects locally needs governance plugin 1.1.4 or later.
 - **Card-level findings have no source location.** The `card-*` and `provider-complete` rules
   are reported on the asset, so their messages name the field.
 - **`validate-authoring` false errors.** It has no A2A domain, so it reports `Invalid
@@ -69,8 +79,9 @@ through a governance profile that covers your A2A agent card assets.
 
 ## Test on Exchange assets
 
-To try the ruleset on real assets, publish the fixtures to a test business group, then attach
-the ruleset to them, for example with a draft governance profile. Copy `.env.example` to `.env`
+The scripts below publish the fixtures to a test business group, so you can check whether hosted
+governance has started reading the card. Attach the ruleset with a draft governance profile.
+Today the findings won't match the descriptions (see the note above). Copy `.env.example` to `.env`
 and fill in a connected app and business group ID; `.env` is gitignored.
 
 ```bash

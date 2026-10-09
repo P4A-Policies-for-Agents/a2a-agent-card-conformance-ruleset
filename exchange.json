@@ -1,7 +1,7 @@
 {
   "main": "ruleset.yaml",
   "name": "A2A Agent Card Conformance",
-  "description": "Enforces the A2A v1.0 REQUIRED fields of an Agent Card and of its provider, interfaces, skills and signatures, plus camelCase JSON.",
+  "description": "Enforces the A2A v1.0 REQUIRED fields of an Agent Card and of its provider, interfaces, skills and signatures, plus camelCase JSON. Local and CI only: hosted Anypoint governance doesn't validate the card.",
   "assetId": "a2a-agent-card-conformance",
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

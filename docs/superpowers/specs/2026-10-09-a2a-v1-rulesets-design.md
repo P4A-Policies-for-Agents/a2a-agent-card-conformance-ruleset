@@ -8,8 +8,8 @@ Ship two MuleSoft API Governance rulesets (AMF Validation Profile 1.0) for **A2A
 public P4A catalog entries. Organizations deploy them from P4A into their own Anypoint orgs and apply
 them through governance profiles to the agent card assets they publish to Exchange.
 
-- **A2A Agent Card Conformance** (`a2a-agent-card-conformance-ruleset`) enforces the parts of the
-  card that the A2A v1.0 specification marks REQUIRED. MuleSoft's parser doesn't enforce them.
+- **A2A Agent Card Conformance** (`a2a-agent-card-conformance-ruleset`) enforces the A2A v1.0
+  REQUIRED fields of the card and of its provider, interfaces, skills and signatures. MuleSoft's parser doesn't enforce them.
 - **A2A Agent Safety** (`a2a-agent-safety-ruleset`) covers transport security, declared
   authentication, deprecated OAuth flows, and card signing.
 
@@ -91,8 +91,8 @@ Only `anypoint-project-builder` 2.7.0 parses it, which ships with governance plu
   `open_id_connect_url`, `authorization_code`, …). They become different properties and classes
   (`core.supported_interfaces`). A snake_case card with an `http://` interface and an API key in the
   query string passed every camelCase safety probe. The spec says JSON MUST use camelCase, so both
-  rulesets add camelCase rules (below). Where an alias sits under a user-chosen map key, it can't be
-  reached; see Limitations.
+  rulesets add camelCase rules (below). An alias wrapper under a user-chosen map key is still a class
+  of its own, so it can be targeted directly (final review).
 - **snake_case paths need prefixes** (found during implementation). A compact IRI can't contain
   `_`: `core.icon_url` makes the validator panic, and the run falls back to legacy mode. The rules
   declare prefixes whose namespace ends with the alias's leading words (`snakeIcon:
@@ -143,7 +143,7 @@ required arrays MUST contain at least one element.
 | `skill-description-required` | `core.skills` | `core.description` present, non-empty | violation |
 | `skill-tags-required` | `core.skills` | `core.tags` minCount 1 | violation |
 | `signature-complete` | `core.signatures` | `core.protected` and `core.signature` present, non-empty | violation |
-| `card-json-camel-case` | G | maxCount 0 on each card-level snake_case alias: `supported_interfaces`, `default_input_modes`, `default_output_modes`, `documentation_url`, `icon_url`, `security_schemes`, `security_requirements` (the spec says JSON MUST use camelCase) | violation |
+| `card-json-camel-case` | G | maxCount 0 on each card-level snake_case alias: `supported_interfaces`, `default_input_modes`, `default_output_modes`, `documentation_url`, `icon_url`, `security_schemes`, `security_requirements`, `capabilities.push_notifications`, `capabilities.extended_agent_card` (the spec says JSON MUST use camelCase) | violation |
 | `interface-json-camel-case` | `core.supportedInterfaces` | maxCount 0 on `core.protocol_binding`, `core.protocol_version` | violation |
 | `skill-json-camel-case` | `core.skills` | maxCount 0 on `core.input_modes`, `core.output_modes`, `core.security_requirements` | violation |
 
@@ -164,7 +164,10 @@ for these objects, so a compliant v0.3 card produces no findings. The cross-chec
 | `oauth-pkce-required` | `core.oauth2SecurityScheme`, if `core.flows / core.authorizationCode` minCount 1 | `core.flows / core.authorizationCode / core.pkceRequired` minCount 1 + in `[true]` | warning |
 | `api-key-not-in-query` | `core.apiKeySecurityScheme` | `core.location` in `[header, cookie]` (query strings leak into logs) | warning |
 | `card-signed` | G | `core.signatures` minCount 1 | info |
-| `card-security-json-camel-case` | G | maxCount 0 on `supported_interfaces`, `security_schemes`, `security_requirements` (snake_case here hides interfaces and schemes from every safety rule) | violation |
+| `card-security-json-camel-case` | G | maxCount 0 on `supported_interfaces`, `security_schemes`, `security_requirements`, `capabilities.extended_agent_card` (snake_case here hides interfaces, schemes and the extended-card flag from every safety rule) | violation |
+| `oauth-flow-urls-https` | `core.oauth2SecurityScheme` | pattern `^https://` on `authorizationUrl`/`tokenUrl`/`refreshUrl` of `authorizationCode`, `tokenUrl`/`refreshUrl` of `clientCredentials`, and `deviceAuthorizationUrl`/`tokenUrl`/`refreshUrl` of `deviceCode` (added in final review) | violation |
+| `api-key-scheme-json-camel-case` | `core.api_key_security_scheme` | always fails on that class (minCount 1 + maxCount 0 on `core.name`): the alias hides the scheme from `api-key-not-in-query` (added in final review) | violation |
+| `oidc-scheme-json-camel-case` | `core.open_id_connect_security_scheme` | same, on `core.openIdConnectUrl`: the alias hides the scheme from `oidc-url-https` (added in final review) | violation |
 | `oauth-flows-json-camel-case` | `core.oauth2SecurityScheme` | maxCount 0 on `core.flows / core.authorization_code`, `core.flows / core.client_credentials`, `core.flows / core.device_code` (hides flows from the PKCE rule) | violation |
 
 A card that sets `extendedAgentCard: true` and declares no security also fails `card-security-declared`.
@@ -246,10 +249,10 @@ Bad fixtures to include beyond the one-per-rule minimum:
   are runtime concerns.
 - **`interface-url-https`** also flags local development cards. That is intended for governed Exchange
   assets.
-- **snake_case scheme wrappers aren't detected.** `api_key_security_scheme` and
-  `open_id_connect_security_scheme` sit under user-chosen scheme names, so a card using them evades
-  `api-key-not-in-query` and `oidc-url-https`. Every other alias that matters is caught by a camelCase
-  rule or by a `minCount` on the camelCase field.
+- **snake_case fields inside schemes and flows aren't all checked** (`token_url`, `pkce_required`, …).
+  They read as missing fields. The scheme wrappers and flow names are caught by camelCase rules.
+- **Conformance doesn't check REQUIRED fields inside security schemes, OAuth flows and
+  extensions.** Safety covers their security-relevant parts.
 - **`validate-authoring` false errors.** It doesn't model A2A v1, so it reports the allowlisted
   per-element targetClasses as errors. `governance:ruleset:validate` and the per-rule fixtures are the
   real gates.

@@ -1,9 +1,10 @@
 #%Validation Profile 1.0
 profile: A2A Agent Card Conformance
 description: >-
-  Enforces the parts of an A2A v1.0 Agent Card that the A2A specification marks REQUIRED and
-  that Anypoint's agent card schema does not enforce: card identity, interfaces, input and
-  output modes, skills, provider, signatures, and camelCase JSON. Applies to Exchange assets
+  Enforces the A2A v1.0 REQUIRED fields that Anypoint's agent card schema does not enforce, on
+  the card itself and on its provider, interfaces, skills and signatures: card identity,
+  interfaces, input and output modes, skills, provider, signatures, and camelCase JSON.
+  Required fields inside security schemes, OAuth flows and extensions are not checked. Applies to Exchange assets
   with classifier a2a-v1-card. Pairs with A2A Agent Safety.
 prefixes:
   api: http://anypoint.com/vocabs/api#
@@ -13,10 +14,12 @@ prefixes:
   snakeDefaultInput: http://a.ml/vocabularies/core#default_input_
   snakeDefaultOutput: http://a.ml/vocabularies/core#default_output_
   snakeDocumentation: http://a.ml/vocabularies/core#documentation_
+  snakeExtendedAgent: http://a.ml/vocabularies/core#extended_agent_
   snakeIcon: http://a.ml/vocabularies/core#icon_
   snakeInput: http://a.ml/vocabularies/core#input_
   snakeOutput: http://a.ml/vocabularies/core#output_
   snakeProtocol: http://a.ml/vocabularies/core#protocol_
+  snakePush: http://a.ml/vocabularies/core#push_
   snakeSecurity: http://a.ml/vocabularies/core#security_
   snakeSupported: http://a.ml/vocabularies/core#supported_
 violation:
@@ -396,7 +399,7 @@ validations:
         minCount: 1
         minLength: 1
   card-json-camel-case:
-    message: Agent Card uses a snake_case field name (supported_interfaces, default_input_modes, default_output_modes, documentation_url, icon_url, security_schemes or security_requirements). Rename it to camelCase; A2A v1.0 JSON MUST use camelCase.
+    message: Agent Card uses a snake_case field name (supported_interfaces, default_input_modes, default_output_modes, documentation_url, icon_url, security_schemes, security_requirements, or capabilities.push_notifications / extended_agent_card). Rename it to camelCase; A2A v1.0 JSON MUST use camelCase.
     documentation: |
       A2A v1.0 says the JSON form of the card MUST use camelCase field names. Anypoint's card
       schema also accepts proto-style snake_case aliases and does not normalize them. A
@@ -428,6 +431,10 @@ validations:
         api.contract / doc.encodes / snakeSecurity.schemes:
           maxCount: 0
         api.contract / doc.encodes / snakeSecurity.requirements:
+          maxCount: 0
+        api.contract / doc.encodes / core.capabilities / snakePush.notifications:
+          maxCount: 0
+        api.contract / doc.encodes / core.capabilities / snakeExtendedAgent.card:
           maxCount: 0
   interface-json-camel-case:
     message: This supportedInterfaces entry uses protocol_binding or protocol_version. Rename it to protocolBinding or protocolVersion; A2A v1.0 JSON MUST use camelCase.

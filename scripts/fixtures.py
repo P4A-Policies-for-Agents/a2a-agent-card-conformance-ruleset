@@ -231,6 +231,9 @@ BAD = {
     "card-json-camel-case.documentation-url": lambda d: put(d, "documentation_url", "https://example.com/docs"),
     "card-json-camel-case.security-schemes": lambda d: put(d, "security_schemes", copy.deepcopy(d["securitySchemes"])),
     "card-json-camel-case.security-requirements": lambda d: put(d, "security_requirements", copy.deepcopy(d["securityRequirements"])),
+    # Final review: capability aliases.
+    "card-json-camel-case.push-notifications": lambda d: rename(d["capabilities"], "pushNotifications", "push_notifications"),
+    "card-json-camel-case.extended-agent-card": lambda d: rename(d["capabilities"], "extendedAgentCard", "extended_agent_card"),
     "interface-json-camel-case.protocol-binding": lambda d: put(iface(d), "protocol_binding", "JSONRPC"),
     "skill-json-camel-case.output-modes": lambda d: put(skill(d), "output_modes", ["text/plain"]),
     "skill-json-camel-case.security-requirements": lambda d: put(skill(d), "security_requirements", copy.deepcopy(d["securityRequirements"])),

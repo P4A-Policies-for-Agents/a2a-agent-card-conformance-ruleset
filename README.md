@@ -1,8 +1,9 @@
 # A2A Agent Card Conformance ruleset
 
 A MuleSoft API Governance ruleset (AMF Validation Profile 1.0) for **A2A v1.0 Agent Cards**:
-Exchange assets with classifier `a2a-v1-card`. It enforces the fields the A2A v1.0 specification
-marks REQUIRED. Anypoint's agent card schema accepts cards that leave them out.
+Exchange assets with classifier `a2a-v1-card`. It enforces the A2A v1.0 REQUIRED fields of the card itself and of its
+provider, interfaces, skills and signatures. Anypoint's agent card schema accepts cards that leave
+them out.
 
 **Pairs with:**
 - [A2A Agent Safety](https://github.com/P4A-Policies-for-Agents/a2a-agent-safety-ruleset), for
@@ -33,7 +34,7 @@ marks REQUIRED. Anypoint's agent card schema accepts cards that leave them out.
 | `skill-description-required` | violation | AgentSkill.description is REQUIRED | Set `description` |
 | `skill-tags-required` | violation | AgentSkill.tags is REQUIRED | Add at least one tag |
 | `signature-complete` | violation | `protected` and `signature` are REQUIRED | Set both on every signature |
-| `card-json-camel-case` | violation | JSON MUST be camelCase; aliases hide fields | Rename snake_case card fields |
+| `card-json-camel-case` | violation | JSON MUST be camelCase; aliases hide fields | Rename snake_case card and capability fields |
 | `interface-json-camel-case` | violation | Same, for interfaces | Rename `protocol_binding`/`protocol_version` |
 | `skill-json-camel-case` | violation | Same, for skills | Rename `input_modes`/`output_modes`/`security_requirements` |
 
@@ -56,6 +57,9 @@ through a governance profile that covers your A2A agent card assets.
 - **`validate-authoring` false errors.** It has no A2A domain, so it reports `Invalid
   targetClass` for `core.supportedInterfaces`, `core.skills` and `core.signatures`.
   `governance:ruleset:validate` accepts the ruleset, and the fixtures prove each rule.
+- **REQUIRED fields inside security schemes, OAuth flows and extensions aren't checked.** For
+  example, an `authorizationCode` flow without `tokenUrl` passes. A2A Agent Safety checks the
+  security-relevant parts of those objects.
 - **v0.3 cards are out of scope.** Only `skill-*` and `signature-complete` reach them.
 - **snake_case aliases are matched through `snake*` prefixes.** Compact IRIs can't contain
   `_`, so a path such as `core.icon_url` makes the validator panic. `ruleset.yaml` declares

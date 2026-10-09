@@ -86,6 +86,13 @@ Only `anypoint-project-builder` 2.7.0 parses it, which ships with governance plu
   - `governance:ruleset:validate` accepts them. That is the validator P4A's worker runs
     (`worker/ruleset-pipeline.ts`).
 - **`in: [true]` ignores a missing value.** Pair it with `minCount: 1`.
+- **snake_case aliases are not normalized.** The v1 schema accepts proto-style snake_case aliases for
+  most fields (`supported_interfaces`, `security_schemes`, `protocol_version`, `api_key_security_scheme`,
+  `open_id_connect_url`, `authorization_code`, …). They become different properties and classes
+  (`core.supported_interfaces`). A snake_case card with an `http://` interface and an API key in the
+  query string passed every camelCase safety probe. The spec says JSON MUST use camelCase, so both
+  rulesets add camelCase rules (below). Where an alias sits under a user-chosen map key, it can't be
+  reached; see Limitations.
 
 ## Rule catalog
 
@@ -131,6 +138,9 @@ required arrays MUST contain at least one element.
 | `skill-description-required` | `core.skills` | `core.description` present, non-empty | violation |
 | `skill-tags-required` | `core.skills` | `core.tags` minCount 1 | violation |
 | `signature-complete` | `core.signatures` | `core.protected` and `core.signature` present, non-empty | violation |
+| `card-json-camel-case` | G | maxCount 0 on each card-level snake_case alias: `supported_interfaces`, `default_input_modes`, `default_output_modes`, `documentation_url`, `icon_url`, `security_schemes`, `security_requirements` (the spec says JSON MUST use camelCase) | violation |
+| `interface-json-camel-case` | `core.supportedInterfaces` | maxCount 0 on `core.protocol_binding`, `core.protocol_version` | violation |
+| `skill-json-camel-case` | `core.skills` | maxCount 0 on `core.input_modes`, `core.output_modes`, `core.security_requirements` | violation |
 
 The `skill-*` and `signature-complete` rules also run on v0.3 cards. v0.3 has the same requirements
 for these objects, so a compliant v0.3 card produces no findings. The cross-check below pins this.
@@ -144,11 +154,13 @@ for these objects, so a compliant v0.3 card produces no findings. The cross-chec
 | `oauth-no-implicit-flow` | `core.oauth2SecurityScheme` | `core.flows / core.implicit` maxCount 0 (deprecated) | violation |
 | `oauth-no-password-flow` | `core.oauth2SecurityScheme` | `core.flows / core.password` maxCount 0 (deprecated) | violation |
 | `oauth-metadata-url-https` | `core.oauth2SecurityScheme` | `core.oauth2MetadataUrl` pattern `^https://` (the spec says "TLS is required") | violation |
-| `oidc-url-https` | `core.openIdConnectSecurityScheme` | `core.openIdConnectUrl` pattern `^https://` | violation |
+| `oidc-url-https` | `core.openIdConnectSecurityScheme` | `core.openIdConnectUrl` minCount 1 + pattern `^https://` (the field is REQUIRED; `minCount` also catches the `open_id_connect_url` alias) | violation |
 | `card-security-declared` | G | `core.securitySchemes` and `core.securityRequirements` minCount 1 | warning |
 | `oauth-pkce-required` | `core.oauth2SecurityScheme`, if `core.flows / core.authorizationCode` minCount 1 | `core.flows / core.authorizationCode / core.pkceRequired` minCount 1 + in `[true]` | warning |
 | `api-key-not-in-query` | `core.apiKeySecurityScheme` | `core.location` in `[header, cookie]` (query strings leak into logs) | warning |
 | `card-signed` | G | `core.signatures` minCount 1 | info |
+| `card-security-json-camel-case` | G | maxCount 0 on `supported_interfaces`, `security_schemes`, `security_requirements` (snake_case here hides interfaces and schemes from every safety rule) | violation |
+| `oauth-flows-json-camel-case` | `core.oauth2SecurityScheme` | maxCount 0 on `core.flows / core.authorization_code`, `core.flows / core.client_credentials`, `core.flows / core.device_code` (hides flows from the PKCE rule) | violation |
 
 A card that sets `extendedAgentCard: true` and declares no security also fails `card-security-declared`.
 That bad fixture carries an `expected` file listing both findings.
@@ -231,6 +243,10 @@ Bad fixtures to include beyond the one-per-rule minimum:
   are runtime concerns.
 - **`interface-url-https`** also flags local development cards. That is intended for governed Exchange
   assets.
+- **snake_case scheme wrappers aren't detected.** `api_key_security_scheme` and
+  `open_id_connect_security_scheme` sit under user-chosen scheme names, so a card using them evades
+  `api-key-not-in-query` and `oidc-url-https`. Every other alias that matters is caught by a camelCase
+  rule or by a `minCount` on the camelCase field.
 - **`validate-authoring` false errors.** It doesn't model A2A v1, so it reports the allowlisted
   per-element targetClasses as errors. `governance:ruleset:validate` and the per-rule fixtures are the
   real gates.

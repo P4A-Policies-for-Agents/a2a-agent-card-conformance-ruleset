@@ -17,6 +17,7 @@ violation:
   - card-skills-required
   - card-supported-interfaces-required
   - card-version-required
+  - provider-complete
 validations:
   card-name-required:
     message: Agent Card has no `name`, or it is empty. Set `name` to a human-readable agent name (A2A v1.0 marks AgentCard.name REQUIRED).
@@ -185,3 +186,31 @@ validations:
       propertyConstraints:
         api.contract / doc.encodes / core.skills:
           minCount: 1
+  provider-complete:
+    message: Agent Card `provider` is missing `organization` or `url`, or one is empty. Set both, or remove `provider` (A2A v1.0 marks AgentProvider.organization and AgentProvider.url REQUIRED).
+    documentation: |
+      `provider` is optional, but when a card declares it, A2A v1.0 requires both
+      `organization` and `url`. Registries show them so people can see who operates the agent
+      and how to reach them. This finding is reported on the asset, not on a line of the card.
+    examples:
+      valid: |
+        {"provider": {"organization": "Example Corp", "url": "https://example.com"}}
+      invalid: |
+        {"provider": {"organization": "Example Corp"}}
+    targetClass: api.Project
+    if:
+      and:
+        - propertyConstraints:
+            catalog.classifier:
+              in: [a2a-v1-card]
+        - propertyConstraints:
+            api.contract / doc.encodes / core.provider:
+              minCount: 1
+    then:
+      propertyConstraints:
+        api.contract / doc.encodes / core.provider / core.organization:
+          minCount: 1
+          minLength: 1
+        api.contract / doc.encodes / core.provider / core.url:
+          minCount: 1
+          minLength: 1

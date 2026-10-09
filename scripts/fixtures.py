@@ -194,6 +194,9 @@ BAD = {
     "card-default-output-modes-required.empty-array": lambda d: put(d, "defaultOutputModes", []),
     "card-skills-required": lambda d: d.pop("skills"),
     "card-skills-required.empty-array": lambda d: put(d, "skills", []),
+    "provider-complete.no-organization": lambda d: d["provider"].pop("organization"),
+    "provider-complete.no-url": lambda d: d["provider"].pop("url"),
+    "provider-complete.empty-url": lambda d: put(d["provider"], "url", ""),
 }
 
 # Fixtures that legitimately trip more than one rule: name -> every "<id>:<Severity>" expected.

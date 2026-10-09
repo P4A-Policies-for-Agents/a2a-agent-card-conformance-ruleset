@@ -1,0 +1,9 @@
+{
+  "main": "agent-card.json",
+  "name": "bad-skill-name-required-empty",
+  "groupId": "p4a-fixtures",
+  "assetId": "bad-skill-name-required-empty",
+  "version": "1.0.0",
+  "classifier": "a2a-v1-card",
+  "descriptorVersion": "1.0.0"
+}

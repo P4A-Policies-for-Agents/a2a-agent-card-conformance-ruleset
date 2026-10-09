@@ -21,6 +21,10 @@ violation:
   - interface-protocol-version-required
   - interface-url-required
   - provider-complete
+  - skill-description-required
+  - skill-id-required
+  - skill-name-required
+  - skill-tags-required
 warning:
   - interface-protocol-binding-known
   - interface-protocol-version-format
@@ -295,3 +299,64 @@ validations:
     propertyConstraints:
       core.protocolBinding:
         in: [JSONRPC, GRPC, "HTTP+JSON"]
+  skill-id-required:
+    message: This skill has no `id`, or it is empty. Set a unique identifier, for example current-weather.
+    documentation: |
+      AgentSkill.id identifies the skill to clients and registries. A2A v1.0 marks it REQUIRED.
+      This rule also runs on v0.3 cards, which have the same requirement.
+    examples:
+      valid: |
+        {"id": "current-weather", "name": "Current weather", "description": "Reports the weather.", "tags": ["weather"]}
+      invalid: |
+        {"name": "Current weather", "description": "Reports the weather.", "tags": ["weather"]}
+    targetClass: core.skills
+    propertyConstraints:
+      core.id:
+        minCount: 1
+        minLength: 1
+  skill-name-required:
+    message: This skill has no `name`, or it is empty. Set a human-readable skill name.
+    documentation: |
+      AgentSkill.name is what people see when browsing an agent's skills. A2A v1.0 marks it
+      REQUIRED. This rule also runs on v0.3 cards, which have the same requirement.
+    examples:
+      valid: |
+        {"id": "current-weather", "name": "Current weather"}
+      invalid: |
+        {"id": "current-weather", "name": ""}
+    targetClass: core.skills
+    propertyConstraints:
+      core.name:
+        minCount: 1
+        minLength: 1
+  skill-description-required:
+    message: This skill has no `description`, or it is empty. Describe what the skill does so clients can route requests to it.
+    documentation: |
+      Routing agents pick a skill by reading its description. A2A v1.0 marks
+      AgentSkill.description REQUIRED. This rule also runs on v0.3 cards, which have the same
+      requirement.
+    examples:
+      valid: |
+        {"id": "forecast", "description": "Gives a five-day forecast for a city."}
+      invalid: |
+        {"id": "forecast"}
+    targetClass: core.skills
+    propertyConstraints:
+      core.description:
+        minCount: 1
+        minLength: 1
+  skill-tags-required:
+    message: This skill has no `tags`, or the list is empty. Add at least one keyword describing the skill.
+    documentation: |
+      Registries and routing agents filter skills by tag. A2A v1.0 marks AgentSkill.tags
+      REQUIRED, and required arrays must hold at least one element. This rule also runs on v0.3
+      cards, which have the same requirement.
+    examples:
+      valid: |
+        {"id": "forecast", "tags": ["weather", "forecast"]}
+      invalid: |
+        {"id": "forecast", "tags": []}
+    targetClass: core.skills
+    propertyConstraints:
+      core.tags:
+        minCount: 1

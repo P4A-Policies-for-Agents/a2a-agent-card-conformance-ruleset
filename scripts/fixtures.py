@@ -208,6 +208,16 @@ BAD = {
     "interface-protocol-version-format": lambda d: put(iface(d), "protocolVersion", "1.0.0"),
     "interface-protocol-version-format.second-interface": lambda d: put(iface(d, 1), "protocolVersion", "v1"),
     "interface-protocol-binding-known": lambda d: put(iface(d), "protocolBinding", "SOAP"),
+    "skill-id-required": lambda d: skill(d).pop("id"),
+    # Review Focus 3: only the second skill is broken.
+    "skill-id-required.second-skill": lambda d: skill(d, 1).pop("id"),
+    "skill-name-required": lambda d: skill(d).pop("name"),
+    "skill-name-required.empty": lambda d: put(skill(d), "name", ""),
+    "skill-description-required": lambda d: skill(d).pop("description"),
+    "skill-description-required.second-skill": lambda d: skill(d, 1).pop("description"),
+    "skill-description-required.empty": lambda d: put(skill(d), "description", ""),
+    "skill-tags-required": lambda d: skill(d).pop("tags"),
+    "skill-tags-required.empty-array": lambda d: put(skill(d), "tags", []),
 }
 
 # Fixtures that legitimately trip more than one rule: name -> every "<id>:<Severity>" expected.

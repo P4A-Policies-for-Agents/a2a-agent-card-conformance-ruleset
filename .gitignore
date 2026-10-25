@@ -1,2 +1,5 @@
 .superpowers/
 .env
+
+# direnv (per-machine GH_TOKEN loader)
+.envrc

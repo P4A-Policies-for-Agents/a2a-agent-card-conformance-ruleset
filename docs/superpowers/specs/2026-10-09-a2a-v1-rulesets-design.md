@@ -196,7 +196,7 @@ fixtures/scope/mcp-manifest/   # MCP manifest (classifier mcp-metadata); must pr
 scripts/check.sh           # the test suite (below)
 README.md                  # purpose, pairing note, rule table (id/severity/why/fix), limitations, CLI requirement, deploy via P4A, Source Ref + date
 CHANGELOG.md
-.envrc                     # GH_TOKEN for tbolis-at-mulesoft
+.envrc                     # GH_TOKEN for tommasobolis
 ```
 
 Each v1 fixture folder holds `agent-card.json` plus an `exchange.json` with

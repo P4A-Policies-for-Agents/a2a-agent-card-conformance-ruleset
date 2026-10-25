@@ -67,7 +67,7 @@ fixtures/scope/{v03-card,mcp-manifest,v1-no-provider}/   # generated; must produ
 fixtures/bad/<rule-id>[.<variant>]/                       # generated; optional `expected` file
 README.md
 CHANGELOG.md
-.envrc                  # export GH_TOKEN="$(gh auth token --user tbolis-at-mulesoft)"
+.envrc                  # export GH_TOKEN="$(gh auth token --user tommasobolis)"
 ```
 
 The conformance repo also holds `docs/superpowers/{specs,plans}/`. Container files: `ms-omni-governance-rulesets/CLAUDE.md` (Task 13). Pinned CLI: `~/.cache/p4a-a2a-cli/` (Task 1, outside any repo).
